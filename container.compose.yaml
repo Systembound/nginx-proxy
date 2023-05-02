@@ -1,0 +1,39 @@
+# WARNING: this may not be 100% production ready, but it's a good start.
+version: '3.3'
+
+services:
+
+
+  nginx:
+    image: nginx:alpine
+    expose:
+      - "80"
+    env_file:
+      - .flaskenv
+    volumes:
+      - .conf.d:/etc/nginx/conf.d
+    networks:
+      - default
+      - web
+    links:
+      - web
+    depends_on:
+      - web
+    restart: unless-stopped
+
+
+  web:
+    environment:
+      - DATABASE_URI=sqlite:////db/api.db
+      - VIRTUAL_HOST=sysbd.link
+      - VIRTUAL_PORT=5000
+    expose:
+      - 5000
+
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
+  web:
+
